@@ -23,4 +23,24 @@ router.post('/:slug/upgrade', authMiddleware, roleMiddleware('Admin'), async (re
     }
 });
 
+// GET /tenants/me
+router.get("/tenants/me", authMiddleware, async (req, res) => {
+    try {
+        const tenant = await Tenant.findById(req.user.tenantId);
+        if (!tenant) return res.status(404).json({ message: "Tenant not found" });
+
+        res.json({ slug: tenant.slug, plan: tenant.plan });
+    } catch (err) {
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+// GET /tenants/me
+router.get("/tenants/me", authMiddleware, async (req, res) => {
+  const tenant = await Tenant.findById(req.user.tenantId);
+  if (!tenant) return res.status(404).json({ message: "Tenant not found" });
+
+  res.json({ slug: tenant.slug, plan: tenant.plan });
+});
+
 module.exports = router;

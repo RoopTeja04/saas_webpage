@@ -18,7 +18,7 @@ app.use(express.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/notes', notesRoutes);
-// app.use('/tenants', tenantsRoutes);
+app.use('/tenants', tenantsRoutes);
 
 // Health endpoint
 app.get('/health', (req, res) => {
