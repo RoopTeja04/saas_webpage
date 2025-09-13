@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-
+const bcrypt = require('bcrypt');
+const User = require('../models/User');
 const Tenant = require('../models/Tenant');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
@@ -31,6 +32,53 @@ router.get('/me', authMiddleware, async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server error" });
+    }
+});
+
+router.post('/:slug/invite', authMiddleware, async (req, res) => {
+    try {
+        const { slug } = req.params;
+        const { email, role } = req.body;
+
+        // Validate role
+        if (!['Admin', 'Member'].includes(role)) {
+            return res.status(400).json({ message: 'Invalid role' });
+        }
+
+        // Check tenant exists
+        const tenant = await Tenant.findOne({ slug });
+        if (!tenant) {
+            return res.status(404).json({ message: 'Tenant not found' });
+        }
+
+        // Check if current user is Admin of the same tenant
+        if (req.user.role !== 'Admin' || req.user.tenantId.toString() !== tenant._id.toString()) {
+            return res.status(403).json({ message: 'Only Admins can invite users in this tenant' });
+        }
+
+        // Check if user already exists
+        const existing = await User.findOne({ email });
+        if (existing) {
+            return res.status(400).json({ message: 'User with this email already exists' });
+        }
+
+        // Default password = "password"
+        const passwordHash = await bcrypt.hash('password', 10);
+
+        const newUser = await User.create({
+            email,
+            passwordHash,
+            role,
+            tenantId: tenant._id
+        });
+
+        res.status(201).json({
+            message: 'User invited successfully',
+            user: { email: newUser.email, role: newUser.role, tenant: tenant.slug }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

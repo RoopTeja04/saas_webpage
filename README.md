@@ -1,4 +1,3 @@
-
 # Multi-Tenant SaaS Notes Application
 
 ## Objective
@@ -17,7 +16,7 @@ The app allows multiple tenants (companies) to securely manage users and notes w
 ### 2. Authentication & Authorization
 - **JWT-based authentication** with `userId`, `role`, and `tenantId` in the payload.
 - Roles:
-  - **Admin**: Can manage users and upgrade subscription plan.
+  - **Admin**: Can manage users, invite users, and upgrade subscription plan.
   - **Member**: Can only create, view, update, and delete notes.
 - Test accounts (all passwords = `password`):
   - `admin@acme.test` → Admin, tenant: Acme  
@@ -27,6 +26,7 @@ The app allows multiple tenants (companies) to securely manage users and notes w
 
 ### 3. Subscription Gating
 - **Free Plan** → Limited to **3 notes per tenant**.  
+  - Shows a **notification** when the limit is reached.  
 - **Pro Plan** → Unlimited notes.  
 - Upgrade endpoint:  
   ```http
@@ -40,19 +40,20 @@ The app allows multiple tenants (companies) to securely manage users and notes w
 - `GET /notes/:id` → Get specific note.  
 - `PUT /notes/:id` → Update note.  
 - `DELETE /notes/:id` → Delete note.  
+- **Edit note functionality** is available via frontend.  
 
-### 5. Deployment
-- Backend + Frontend deployed on **Vercel**.  
-- **CORS enabled** for API access.  
-- Health endpoint:  
+### 5. Admin Features
+- **Invite users** (Admin only) via:
   ```http
-  GET /health → { "status": "ok" }
+  POST /tenants/:slug/invite
   ```
+- Admin can assign **Admin** or **Member** roles during invitation.  
 
 ### 6. Frontend (React)
 - Login using predefined accounts.  
-- Manage (list, create, delete) notes.  
+- Manage (list, create, edit, delete) notes.  
 - Shows **“Upgrade to Pro”** option when free plan hits limit.  
+- Admin can invite users directly from the UI.  
 - Logout option available.  
 
 ---
@@ -114,5 +115,10 @@ GET /health → { "status": "ok" }
 
 ---
 
-## License
-MIT
+## Additional Notes
+- **Role-based restrictions** are enforced across all routes.  
+- **Tenant isolation** ensures that users cannot access notes from other tenants.  
+- Free plan restrictions and Pro plan upgrades work immediately without re-login.  
+- Frontend fully supports creating, editing, deleting notes, inviting users (Admin), and upgrading plan.  
+
+---

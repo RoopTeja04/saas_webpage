@@ -1,6 +1,6 @@
 import React from "react";
 
-const NoteItem = ({ note, onDelete }) => {
+const NoteItem = ({ note, onDelete, onEdit }) => {
     return (
         <li
             style={{
@@ -16,9 +16,15 @@ const NoteItem = ({ note, onDelete }) => {
             <br />
             <button
                 onClick={() => onDelete(note._id)}
-                style={{ marginTop: "5px", background: "red", color: "white" }}
+                style={{ marginTop: "5px", background: "red", color: "white", marginRight: "10px" }}
             >
                 Delete
+            </button>
+            <button
+                onClick={() => onEdit(note)}
+                style={{ marginTop: "5px", background: "blue", color: "white" }}
+            >
+                Edit
             </button>
         </li>
     );
