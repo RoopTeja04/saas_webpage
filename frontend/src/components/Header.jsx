@@ -2,33 +2,28 @@ import React from "react";
 
 const Header = ({ role, tenantPlan, onUpgrade, onLogout }) => {
     return (
-        <header
-            style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "10px 20px",
-                borderBottom: "1px solid #ccc",
-                marginBottom: "20px",
-            }}
-        >
-            <h2>Multi-Tenant Notes App</h2>
+        <header className="flex justify-between items-center p-4 bg-gray-100 rounded mb-6 shadow font-sans">
+            <h2 className="text-xl font-bold text-gray-800">Multi-Tenant Notes App</h2>
 
-            <div>
-                <span style={{ marginRight: "15px" }}>
-                    Role: <strong>{role}</strong>
-                </span>
-                <span style={{ marginRight: "15px" }}>
-                    Plan: <strong>{tenantPlan}</strong>
-                </span>
+            <div className="flex items-center space-x-4">
+                <span>Role: <strong>{role}</strong></span>
+                <span>Plan: <strong>{tenantPlan}</strong></span>
 
                 {role === "Admin" && tenantPlan === "free" && (
-                    <button onClick={onUpgrade} style={{ marginRight: "10px" }}>
+                    <button
+                        onClick={onUpgrade}
+                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-all"
+                    >
                         Upgrade to Pro
                     </button>
                 )}
 
-                <button onClick={onLogout}>Logout</button>
+                <button
+                    onClick={onLogout}
+                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-all"
+                >
+                    Logout
+                </button>
             </div>
         </header>
     );

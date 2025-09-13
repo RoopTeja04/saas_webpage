@@ -10,14 +10,14 @@ The app allows multiple tenants (companies) to securely manage users and notes w
 
 ### 1. Multi-Tenancy
 - Two tenants supported: **Acme** and **Globex**.
-- Isolation via a **shared schema with `tenantId` field** in every document (Users, Notes).
-- Each tenant’s data is completely isolated.
+- Approach: **Shared schema with `tenantId` field** in every document (Users, Notes).
+- Guarantees strict isolation: one tenant’s data is never accessible to another.
 
 ### 2. Authentication & Authorization
-- **JWT-based authentication** with `userId`, `role`, and `tenantId` in the payload.
+- **JWT-based authentication** with `userId`, `role`, `tenantId`, and `tenantSlug` in the payload.
 - Roles:
-  - **Admin**: Can manage users, invite users, and upgrade subscription plan.
-  - **Member**: Can only create, view, update, and delete notes.
+  - **Admin**: Can invite users and upgrade subscription plan.
+  - **Member**: Can create, view, update, and delete notes.
 - Test accounts (all passwords = `password`):
   - `admin@acme.test` → Admin, tenant: Acme  
   - `user@acme.test` → Member, tenant: Acme  
@@ -26,43 +26,43 @@ The app allows multiple tenants (companies) to securely manage users and notes w
 
 ### 3. Subscription Gating
 - **Free Plan** → Limited to **3 notes per tenant**.  
-  - Shows a **notification** when the limit is reached.  
+  - Frontend shows a **notification** when the limit is reached.  
 - **Pro Plan** → Unlimited notes.  
 - Upgrade endpoint:  
   ```http
   POST /tenants/:slug/upgrade
   ```
-  (Only accessible by Admin).  
+  *(Accessible only by Admins)*
 
 ### 4. Notes API (CRUD)
-- `POST /notes` → Create a note.  
-- `GET /notes` → List all notes for current tenant.  
-- `GET /notes/:id` → Get specific note.  
-- `PUT /notes/:id` → Update note.  
-- `DELETE /notes/:id` → Delete note.  
-- **Edit note functionality** is available via frontend.  
+- `POST /notes` → Create a note  
+- `GET /notes` → List all notes for current tenant  
+- `GET /notes/:id` → Get a specific note  
+- `PUT /notes/:id` → Update a note  
+- `DELETE /notes/:id` → Delete a note  
+- Fully tenant-isolated and role-enforced.
 
 ### 5. Admin Features
-- **Invite users** (Admin only) via:
+- **Invite users** (Admin only):  
   ```http
   POST /tenants/:slug/invite
   ```
-- Admin can assign **Admin** or **Member** roles during invitation.  
+- Can invite both **Admins** and **Members**.
 
-### 6. Frontend (React)
+### 6. Frontend (React + Tailwind)
 - Login using predefined accounts.  
-- Manage (list, create, edit, delete) notes.  
-- Shows **“Upgrade to Pro”** option when free plan hits limit.  
-- Admin can invite users directly from the UI.  
-- Logout option available.  
+- Manage notes (list, create, edit, delete).  
+- Shows **“Upgrade to Pro”** option when Free plan hits limit.  
+- Admin-only UI for inviting users and upgrading plan.  
+- Logout included.  
 
 ---
 
 ## Tech Stack
-- **Frontend**: React, Axios, React Router.  
-- **Backend**: Node.js, Express.js, JWT, bcrypt, Mongoose.  
-- **Database**: MongoDB Atlas.  
-- **Deployment**: Vercel.  
+- **Frontend**: React, TailwindCSS, Axios, React Router  
+- **Backend**: Node.js, Express.js, JWT, bcrypt, Mongoose  
+- **Database**: MongoDB Atlas  
+- **Deployment**: Vercel  
 
 ---
 
@@ -71,13 +71,20 @@ The app allows multiple tenants (companies) to securely manage users and notes w
 ### 1. Clone Repository
 ```bash
 git clone https://github.com/RoopTeja04/saas_webpage.git
-cd notes-app
+cd saas_webpage
 ```
 
 ### 2. Backend Setup
 ```bash
 cd backend
 npm install
+```
+
+Environment variables (`.env`):
+```env
+MONGO_URI=your-mongodb-uri
+JWT_SECRET=your-secret
+JWT_EXPIRES_IN=2h
 ```
 
 Seed Database:
@@ -99,12 +106,20 @@ npm start
 
 ---
 
+## Deployment
+- **Backend API**: [https://your-backend.vercel.app](https://your-backend.vercel.app)  
+- **Frontend UI**: [https://your-frontend.vercel.app](https://your-frontend.vercel.app)  
+
+*(Update with actual deployed URLs before submission)*
+
+---
+
 ## Test Accounts
 - `admin@acme.test` → Admin, tenant: Acme  
 - `user@acme.test` → Member, tenant: Acme  
 - `admin@globex.test` → Admin, tenant: Globex  
 - `user@globex.test` → Member, tenant: Globex  
-(All with password: `password`)
+(All passwords: `password`)  
 
 ---
 
@@ -115,10 +130,8 @@ GET /health → { "status": "ok" }
 
 ---
 
-## Additional Notes
-- **Role-based restrictions** are enforced across all routes.  
-- **Tenant isolation** ensures that users cannot access notes from other tenants.  
-- Free plan restrictions and Pro plan upgrades work immediately without re-login.  
-- Frontend fully supports creating, editing, deleting notes, inviting users (Admin), and upgrading plan.  
-
----
+## Notes
+- **Strict tenant isolation** → No data leakage between tenants.  
+- **Role enforcement** → Members cannot invite/upgrade.  
+- **Subscription enforcement** → Free plan max 3 notes, Pro = unlimited.  
+- Upgrades take effect immediately without re-login.  

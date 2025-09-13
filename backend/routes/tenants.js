@@ -40,29 +40,24 @@ router.post('/:slug/invite', authMiddleware, async (req, res) => {
         const { slug } = req.params;
         const { email, role } = req.body;
 
-        // Validate role
         if (!['Admin', 'Member'].includes(role)) {
             return res.status(400).json({ message: 'Invalid role' });
         }
 
-        // Check tenant exists
         const tenant = await Tenant.findOne({ slug });
         if (!tenant) {
             return res.status(404).json({ message: 'Tenant not found' });
         }
 
-        // Check if current user is Admin of the same tenant
         if (req.user.role !== 'Admin' || req.user.tenantId.toString() !== tenant._id.toString()) {
             return res.status(403).json({ message: 'Only Admins can invite users in this tenant' });
         }
 
-        // Check if user already exists
         const existing = await User.findOne({ email });
         if (existing) {
             return res.status(400).json({ message: 'User with this email already exists' });
         }
 
-        // Default password = "password"
         const passwordHash = await bcrypt.hash('password', 10);
 
         const newUser = await User.create({

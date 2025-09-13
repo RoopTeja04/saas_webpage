@@ -10,6 +10,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
     try {
         const tenant = await Tenant.findById(tenantId);
+        if (!tenant) return res.status(400).json({ message: 'Tenant not found' });
 
         if (tenant.plan === 'free') {
             const tenantNotesCount = await Note.countDocuments({ tenantId });
@@ -18,7 +19,14 @@ router.post('/', authMiddleware, async (req, res) => {
             }
         }
 
-        const note = await Note.create({ title, content, tenantId, createdBy: userId });
+        const note = await Note.create({
+            title,
+            content,
+            tenantId,
+            userId,
+            createdBy: userId
+        });
+
         res.status(201).json(note);
     } catch (err) {
         console.error(err);
@@ -28,9 +36,8 @@ router.post('/', authMiddleware, async (req, res) => {
 
 router.get('/', authMiddleware, async (req, res) => {
     const { tenantId } = req.user;
-
     try {
-        const notes = await Note.find({ tenantId });
+        const notes = await Note.find({ tenantId }).sort({ createdAt: -1 });
         res.json(notes);
     } catch (err) {
         console.error(err);
@@ -41,7 +48,6 @@ router.get('/', authMiddleware, async (req, res) => {
 router.get('/:id', authMiddleware, async (req, res) => {
     const { tenantId } = req.user;
     const { id } = req.params;
-
     try {
         const note = await Note.findOne({ _id: id, tenantId });
         if (!note) return res.status(404).json({ message: 'Note not found' });
@@ -85,4 +91,4 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-module.exports = router;    
+module.exports = router;
