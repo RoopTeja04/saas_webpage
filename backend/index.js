@@ -1,10 +1,9 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-
 const Tenant = require('./models/Tenant');
 const User = require('./models/User');
-const Note = require('./models/Note'); // make sure you have a Note model
+const Note = require('./models/Note');
 
 const MONGO_URI = process.env.MONGO_URI;
 
@@ -12,18 +11,15 @@ async function seed() {
     await mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
     console.log('Connected to DB');
 
-    // Clear previous data
     await Tenant.deleteMany({});
     await User.deleteMany({});
     await Note.deleteMany({});
 
-    // Create tenants (both start with free plan)
     const acme = await Tenant.create({ name: 'Acme', slug: 'acme', plan: 'free' });
     const globex = await Tenant.create({ name: 'Globex', slug: 'globex', plan: 'free' });
 
     const passwordHash = await bcrypt.hash('password', 10);
 
-    // Create users for Acme
     const acmeAdmin = await User.create({
         email: 'admin@acme.test',
         passwordHash,
@@ -38,7 +34,6 @@ async function seed() {
         tenantId: acme._id
     });
 
-    // Create users for Globex
     const globexAdmin = await User.create({
         email: 'admin@globex.test',
         passwordHash,
@@ -53,7 +48,6 @@ async function seed() {
         tenantId: globex._id
     });
 
-    // Seed some sample notes (belongs to Acme + Globex separately)
     await Note.create([
         { title: 'Acme Admin Note', content: 'This is Acme admin note', tenantId: acme._id, userId: acmeAdmin._id },
         { title: 'Acme User Note', content: 'This is Acme user note', tenantId: acme._id, userId: acmeUser._id },

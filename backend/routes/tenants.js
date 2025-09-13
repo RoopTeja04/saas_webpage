@@ -5,7 +5,6 @@ const Tenant = require('../models/Tenant');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 
-// ---------- UPGRADE TENANT ----------
 router.post('/:slug/upgrade', authMiddleware, roleMiddleware('Admin'), async (req, res) => {
     const { slug } = req.params;
 
@@ -23,7 +22,6 @@ router.post('/:slug/upgrade', authMiddleware, roleMiddleware('Admin'), async (re
     }
 });
 
-// ---------- GET CURRENT TENANT ----------
 router.get('/me', authMiddleware, async (req, res) => {
     try {
         const tenant = await Tenant.findById(req.user.tenantId);

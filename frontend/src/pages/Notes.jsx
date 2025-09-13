@@ -15,13 +15,11 @@ const Notes = () => {
     const [tenantSlug, setTenantSlug] = useState("");
     const navigate = useNavigate();
 
-    // Fetch notes
     const fetchNotes = async () => {
         try {
             const res = await API.get("/notes");
             setNotes(res.data);
 
-            // Decode JWT token
             const token = localStorage.getItem("token");
             if (token) {
                 const payload = JSON.parse(atob(token.split(".")[1]));
@@ -36,7 +34,6 @@ const Notes = () => {
         }
     };
 
-    // Create new note
     const createNote = async (e) => {
         e.preventDefault();
         try {
@@ -52,7 +49,6 @@ const Notes = () => {
         }
     };
 
-    // Delete a note
     const deleteNote = async (id) => {
         try {
             await API.delete(`/notes/${id}`);
@@ -62,7 +58,6 @@ const Notes = () => {
         }
     };
 
-    // Upgrade tenant plan
     const upgradeTenant = async () => {
         try {
             await API.post(`/tenants/${tenantSlug}/upgrade`);
@@ -74,7 +69,6 @@ const Notes = () => {
         }
     };
 
-    // Logout
     const logout = () => {
         localStorage.removeItem("token");
         navigate("/login");
@@ -111,7 +105,6 @@ const Notes = () => {
             {error && <p style={{ color: "red" }}>{error}</p>}
             {success && <p style={{ color: "green" }}>{success}</p>}
 
-            {/* Upgrade button visible only to Admins */}
             {role === "Admin" && tenantPlan === "free" && (
                 <button onClick={upgradeTenant} style={{ marginTop: "20px" }}>
                     Upgrade to Pro

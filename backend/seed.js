@@ -12,17 +12,14 @@ async function seed() {
 
     console.log('Connected to DB');
 
-    // Clear previous data
     await Tenant.deleteMany({});
     await User.deleteMany({});
-
-    // Create tenants
+    
     const acme = await Tenant.create({ name: 'Acme', slug: 'acme', plan: 'free' });
     const globex = await Tenant.create({ name: 'Globex', slug: 'globex', plan: 'free' });
 
     const passwordHash = await bcrypt.hash('password', 10);
 
-    // Create users
     await User.create([
         { email: 'admin@acme.test', passwordHash, role: 'Admin', tenantId: acme._id },
         { email: 'user@acme.test', passwordHash, role: 'Member', tenantId: acme._id },

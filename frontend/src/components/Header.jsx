@@ -22,7 +22,6 @@ const Header = ({ role, tenantPlan, onUpgrade, onLogout }) => {
                     Plan: <strong>{tenantPlan}</strong>
                 </span>
 
-                {/* Show upgrade button only for Admin + free plan */}
                 {role === "Admin" && tenantPlan === "free" && (
                     <button onClick={onUpgrade} style={{ marginRight: "10px" }}>
                         Upgrade to Pro

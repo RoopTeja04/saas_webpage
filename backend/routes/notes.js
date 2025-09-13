@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
-
 const Note = require('../models/Note');
 const authMiddleware = require('../middleware/authMiddleware');
 const Tenant = require('../models/Tenant');
 
-// ---------- CREATE NOTE ----------
 router.post('/', authMiddleware, async (req, res) => {
     const { title, content } = req.body;
     const { tenantId, userId } = req.user;
@@ -28,7 +26,6 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 });
 
-// ---------- GET ALL NOTES ----------
 router.get('/', authMiddleware, async (req, res) => {
     const { tenantId } = req.user;
 
@@ -41,7 +38,6 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 });
 
-// ---------- GET NOTE BY ID ----------
 router.get('/:id', authMiddleware, async (req, res) => {
     const { tenantId } = req.user;
     const { id } = req.params;
@@ -56,7 +52,6 @@ router.get('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// ---------- UPDATE NOTE ----------
 router.put('/:id', authMiddleware, async (req, res) => {
     const { tenantId } = req.user;
     const { id } = req.params;
@@ -76,7 +71,6 @@ router.put('/:id', authMiddleware, async (req, res) => {
     }
 });
 
-// ---------- DELETE NOTE ----------
 router.delete('/:id', authMiddleware, async (req, res) => {
     const { tenantId } = req.user;
     const { id } = req.params;
