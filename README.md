@@ -69,7 +69,7 @@ The app allows multiple tenants (companies) to securely manage users and notes w
 
 ### 1. Clone Repository
 ```bash
-git clone <repo_url>
+git clone https://github.com/RoopTeja04/saas_webpage.git
 cd notes-app
 ```
 
@@ -77,13 +77,6 @@ cd notes-app
 ```bash
 cd backend
 npm install
-```
-Create `.env` file:
-```env
-PORT=5000
-MONGO_URI=<your_mongodb_uri>
-JWT_SECRET=MY_Secret_Code
-JWT_Expires_In=2h
 ```
 
 Seed Database:
