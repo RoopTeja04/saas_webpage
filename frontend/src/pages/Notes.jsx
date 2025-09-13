@@ -12,28 +12,31 @@ const Notes = () => {
     const [success, setSuccess] = useState("");
     const [tenantPlan, setTenantPlan] = useState("free");
     const [role, setRole] = useState("");
+    const [tenantSlug, setTenantSlug] = useState("");
     const navigate = useNavigate();
 
+    // Fetch notes
     const fetchNotes = async () => {
         try {
             const res = await API.get("/notes");
             setNotes(res.data);
 
-            // Decode JWT to extract role and tenant info
+            // Decode JWT token
             const token = localStorage.getItem("token");
             if (token) {
                 const payload = JSON.parse(atob(token.split(".")[1]));
                 setRole(payload.role);
-
-                // instead of calling /tenants/me, use tenant info from token
-                setTenantPlan(payload.plan || "free");
-                // make sure backend includes plan in JWT payload
             }
+
+            const tenantRes = await API.get("/tenants/me");
+            setTenantPlan(tenantRes.data.plan);
+            setTenantSlug(tenantRes.data.slug);
         } catch (err) {
             setError("Failed to fetch notes");
         }
     };
 
+    // Create new note
     const createNote = async (e) => {
         e.preventDefault();
         try {
@@ -49,6 +52,7 @@ const Notes = () => {
         }
     };
 
+    // Delete a note
     const deleteNote = async (id) => {
         try {
             await API.delete(`/notes/${id}`);
@@ -58,17 +62,10 @@ const Notes = () => {
         }
     };
 
+    // Upgrade tenant plan
     const upgradeTenant = async () => {
         try {
-            const token = localStorage.getItem("token");
-            if (token) {
-                const payload = JSON.parse(atob(token.split(".")[1]));
-                setRole(payload.role);
-                setTenantPlan(payload.plan);
-            }
-            
-            await API.post(`/tenants/${payload.tenantSlug}/upgrade`);
-
+            await API.post(`/tenants/${tenantSlug}/upgrade`);
             setTenantPlan("pro");
             setSuccess("Tenant upgraded to Pro!");
             setError("");
@@ -77,6 +74,7 @@ const Notes = () => {
         }
     };
 
+    // Logout
     const logout = () => {
         localStorage.removeItem("token");
         navigate("/login");

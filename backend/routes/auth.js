@@ -9,7 +9,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).populate("tenantId");
         if (!user) return res.status(401).json({ message: 'Invalid email or password' });
 
         const isMatch = await bcrypt.compare(password, user.passwordHash);
@@ -18,10 +18,12 @@ router.post('/login', async (req, res) => {
         const payload = {
             userId: user._id,
             role: user.role,
-            tenantId: user.tenantId
+            tenantId: user.tenantId._id,
+            tenantSlug: user.tenantId.slug,
+            plan: user.tenantId.plan
         };
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || "2h" });
 
         res.json({ token });
     } catch (err) {
